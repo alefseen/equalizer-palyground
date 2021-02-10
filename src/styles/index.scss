@@ -1,2 +1,30 @@
 @import 'variables';
 @import 'base';
+
+$cover_size: 500px;
+
+.container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .musicWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .cover {
+      border-radius: 5px;
+      width: $cover_size;
+      height: $cover_size;
+      object-fit: cover;
+      object-position: center;
+    }
+    #canvas {
+      position: absolute;
+    }
+  }
+}
