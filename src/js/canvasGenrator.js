@@ -1,9 +1,13 @@
 import audioParser from './audioParser'
 
+const img = new Image()
+img.src = '/assets/cover.jpg'
+
 let ctx
-let canvas
-const audioPath = '/assets/music.mp3'
+const coverSize = 300
+const audioPath = '/assets/viber.mp3'
 const barsCountPower = 5
+const ftt = 2 ** (barsCountPower + 1)
 const scale = 1.5
 const maxChangeInFrame = 10
 const barWidth = 20
@@ -12,10 +16,9 @@ let lastFreq = new Array(2 ** 5).fill(0)
 const { sqrt, PI, cos, abs, sign } = Math
 
 const canvasGenrator = () => {
-  canvas = document.getElementById('canvas')
-  const coverRect = canvas.parentElement.getBoundingClientRect()
-  canvas.height = coverRect.height * sqrt(2) * scale
-  canvas.width = coverRect.width * sqrt(2) * scale
+  const canvas = document.getElementById('canvas')
+  canvas.height = coverSize * sqrt(2) * scale
+  canvas.width = coverSize * sqrt(2) * scale
   ctx = canvas.getContext('2d')
 
   const fillCanvas = (array) => {
@@ -37,11 +40,10 @@ const canvasGenrator = () => {
       const angleDuration = PI / 2
 
       const minHeight =
-        -coverRect.height /
-        (2 * cos(startAngle + (angleDuration * i) / array.length))
+        -coverSize / (2 * cos(startAngle + (angleDuration * i) / array.length))
       const barHeight = minHeight + newValue / 1.5
 
-      ctx.fillStyle = '#fff'
+      ctx.fillStyle = '#F90000'
 
       const x = (canvas.width - barWidth / 2) / 2
       const y = canvas.height / 2
@@ -56,6 +58,40 @@ const canvasGenrator = () => {
       ctx.restore()
     }
 
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.drawImage(
+      img,
+      (canvas.width - coverSize) / 2,
+      (canvas.height - coverSize) / 2,
+      coverSize,
+      coverSize
+    )
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    ctx.arc(95, 50, 40, 0, 2 * Math.PI)
+    const { data } = imageData
+
+    for (let i = 0; i < data.length; i += array.length * 3) {
+      for (let j = 0; j < array.length; j += 1) {
+        const parsedValue = array[j] - 100
+
+        if (
+          data[i + j * 4] > 128 &&
+          data[i + 1 + j * 4] < 16 &&
+          data[i + 2 + j * 4] < 16
+        ) {
+          data[i + j * 4] = parsedValue > 255 ? 255 : parsedValue * 5
+        }
+        // if (
+        //   data[i + j * 4] > 215 &&
+        //   data[i + 1 + j * 4] > 215 &&
+        //   data[i + 2 + j * 4] > 215
+        // ) {
+        //   data[i + j * 4] = parsedValue > 255 ? 255 : parsedValue * 5
+        // }
+      }
+    }
+    ctx.putImageData(imageData, 0, 0)
     lastFreq = [...newFreq]
   }
 
@@ -70,11 +106,7 @@ const canvasGenrator = () => {
       window.webkitRequestAnimationFrame(drawer)
   }
 
-  const { play } = audioParser(
-    audioPath,
-    initAnimationFrame,
-    2 ** (barsCountPower + 1)
-  )
+  const { play } = audioParser(audioPath, initAnimationFrame, ftt)
 
   play()
 }
