@@ -1,25 +1,33 @@
 import audioParser from './audioParser'
 
-const img = new Image()
-img.src = '/assets/cover.jpg'
+const addImageProcess = (src) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
 
 let ctx
 const coverSize = 300
 const audioPath = '/assets/viber.mp3'
-const barsCountPower = 5
+const coverPath = '/assets/cover.jpg'
+const barsCountPower = 7
 const ftt = 2 ** (barsCountPower + 1)
 const scale = 1.5
-const maxChangeInFrame = 10
-const barWidth = 20
+const maxChangeInFrame = 5
+const barWidth = 5
 let lastFreq = new Array(2 ** 5).fill(0)
 
 const { sqrt, PI, cos, abs, sign } = Math
 
-const canvasGenrator = () => {
+const canvasGenrator = async () => {
   const canvas = document.getElementById('canvas')
   canvas.height = coverSize * sqrt(2) * scale
   canvas.width = coverSize * sqrt(2) * scale
   ctx = canvas.getContext('2d')
+  const img = await addImageProcess(coverPath)
 
   const fillCanvas = (array) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -41,9 +49,9 @@ const canvasGenrator = () => {
 
       const minHeight =
         -coverSize / (2 * cos(startAngle + (angleDuration * i) / array.length))
-      const barHeight = minHeight + newValue / 1.5
+      const barHeight = minHeight + (newValue - 100) / 0.5
 
-      ctx.fillStyle = '#F90000'
+      ctx.fillStyle = '#990'
 
       const x = (canvas.width - barWidth / 2) / 2
       const y = canvas.height / 2
@@ -77,7 +85,7 @@ const canvasGenrator = () => {
 
         if (
           data[i + j * 4] > 128 &&
-          data[i + 1 + j * 4] < 16 &&
+          data[i + 1 + j * 4] > 128 &&
           data[i + 2 + j * 4] < 16
         ) {
           data[i + j * 4] = parsedValue > 255 ? 255 : parsedValue * 5
