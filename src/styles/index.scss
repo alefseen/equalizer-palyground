@@ -1,7 +1,7 @@
 @import 'variables';
 @import 'base';
 
-$cover_size: 500px;
+$cover_size: 300px;
 
 .container {
   height: 100vh;
@@ -25,6 +25,7 @@ $cover_size: 500px;
     }
     #canvas {
       position: absolute;
+      z-index: -1;
     }
   }
 }
