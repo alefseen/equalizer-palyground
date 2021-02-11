@@ -7,7 +7,7 @@ const paths = require('./paths')
 
 module.exports = {
   // Where webpack looks to start building the bundle
-  entry: [paths.src + '/index.js'],
+  entry: ['babel-polyfill', paths.src + '/index.js'],
 
   // Where webpack outputs the assets and bundles
   output: {
@@ -39,7 +39,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Equlazer',
       filename: 'index.html', // output file
-      template: paths.src + '/index.html'
+      template: paths.src + '/index.html',
     }),
 
     // ESLint configuration

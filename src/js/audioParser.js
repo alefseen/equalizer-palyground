@@ -1,4 +1,4 @@
-function startParsing(audioUrl, requestAnimeFrame, fftSize) {
+function startParsing(audioUrl, requestAnimeFrame, fftSize, onEndAudioPlaying) {
   let audioContext
   let sourceNode
   let analyserNode
@@ -30,7 +30,11 @@ function startParsing(audioUrl, requestAnimeFrame, fftSize) {
   function playSound(buffer) {
     sourceNode.buffer = buffer
     sourceNode.start(0)
-    sourceNode.loop = true
+    sourceNode.onended = () => {
+      onEndAudioPlaying()
+      audioPlaying = false
+    }
+    sourceNode.loop = false
     audioPlaying = true
   }
 
