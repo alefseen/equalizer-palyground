@@ -4,7 +4,9 @@ export default () => {
   const container = document.createElement('div')
   container.append('Hello Amir Soltanyan!')
 
-  canvasGenrator()
+  window.addEventListener('load', () => {
+    canvasGenrator()
+  })
 
   return container
 }
