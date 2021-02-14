@@ -1,9 +1,8 @@
-function startParsing(audioUrl, requestAnimeFrame, fftSize, onEndAudioPlaying) {
+function startParsing(audioElement, requestAnimeFrame, fftSize) {
   let audioContext
   let sourceNode
   let analyserNode
   let javascriptNode
-  let audioData = null
   let audioPlaying = false
   const sampleSize = 1024
   let amplitudeArray
@@ -14,7 +13,7 @@ function startParsing(audioUrl, requestAnimeFrame, fftSize, onEndAudioPlaying) {
     window.mozAudioContext)()
 
   function setupAudioNodes() {
-    sourceNode = audioContext.createBufferSource()
+    sourceNode = audioContext.createMediaElementSource(audioElement)
     analyserNode = audioContext.createAnalyser()
     analyserNode.fftSize = fftSize
     javascriptNode = audioContext.createScriptProcessor(sampleSize, 1, 1)
@@ -27,40 +26,18 @@ function startParsing(audioUrl, requestAnimeFrame, fftSize, onEndAudioPlaying) {
     javascriptNode.connect(audioContext.destination)
   }
 
-  function playSound(buffer) {
-    sourceNode.buffer = buffer
-    sourceNode.start(0)
-    sourceNode.onended = () => {
-      onEndAudioPlaying()
-      audioPlaying = false
+  function loadSound() {
+    if (sourceNode.mediaElement) {
+      sourceNode.mediaElement.onplay = () => {
+        audioPlaying = true
+      }
+      sourceNode.mediaElement.onpause = () => {
+        audioPlaying = false
+      }
     }
-    sourceNode.loop = false
-    audioPlaying = true
   }
 
-  function onError(e) {
-    // eslint-disable-next-line no-console
-    console.log(e)
-  }
-
-  function loadSound(url) {
-    const request = new XMLHttpRequest()
-    request.open('GET', url, true)
-    request.responseType = 'arraybuffer'
-    request.onload = () => {
-      audioContext.decodeAudioData(
-        request.response,
-        (buffer) => {
-          audioData = buffer
-          playSound(audioData)
-        },
-        onError
-      )
-    }
-    request.send()
-  }
-
-  const play = () => {
+  const start = () => {
     if (!audioContext) {
       try {
         audioContext = new AudioContext()
@@ -77,20 +54,11 @@ function startParsing(audioUrl, requestAnimeFrame, fftSize, onEndAudioPlaying) {
         requestAnimeFrame(amplitudeArray)
       }
     }
-    if (audioData == null) {
-      loadSound(audioUrl)
-    } else {
-      playSound(audioData)
-    }
+    loadSound()
   }
 
-  const pause = () => {
-    sourceNode.stop(0)
-    audioPlaying = false
-  }
   return {
-    play,
-    pause,
+    start,
   }
 }
 

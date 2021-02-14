@@ -11,7 +11,6 @@ const addImageProcess = (src) => {
 
 let ctx
 const coverSize = 300
-const audioPath = '/assets/viber.mp3'
 const coverPath = '/assets/cover.jpg'
 const barsCountPower = 5
 const ftt = 2 ** (barsCountPower + 1)
@@ -118,16 +117,16 @@ const canvasGenrator = async () => {
       window.webkitRequestAnimationFrame(drawer)
   }
 
-  const { play, pause } = audioParser(
-    audioPath,
+  const audioElement = document.getElementById('myAudio')
+  const { start } = audioParser(
+    audioElement,
     initAnimationFrame,
     ftt,
     onEndAudioPlaying
   )
-  play()
+  start()
   return {
-    play,
-    pause,
+    start,
   }
 }
 

@@ -16,6 +16,10 @@ $cover_size: 300px;
     align-items: center;
     justify-content: center;
 
+    audio {
+      position: absolute;
+      bottom: 0;
+    }
     .cover {
       border-radius: 5px;
       width: $cover_size;
@@ -24,8 +28,6 @@ $cover_size: 300px;
       object-position: center;
     }
     #canvas {
-      position: absolute;
-      z-index: -1;
     }
   }
 }
